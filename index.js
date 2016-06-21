@@ -1,34 +1,25 @@
-var self = require("sdk/self");
-var {Cu, Ci, Cc} = require("chrome");
+const {env} = require('sdk/system/environment');
+var {Ci, Cc} = require('chrome');
+var {Services}  = require('resource://gre/modules/Services.jsm');
 
-// Cu.import("resource://gre/modules/Services.jsm");
-var { Services }  = require("resource://gre/modules/Services.jsm");
+// dotfirefox path
+const homePath = env.HOME;
+const dotfirefoxPath = `${homePath}/dotfirefox/`;
 
-var resProt = Services.io.getProtocolHandler("resource")
+// register 'dotfirefox' as an alias path, taken from
+// https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Using
+var resProt = Services.io.getProtocolHandler('resource')
       .QueryInterface(Ci.nsIResProtocolHandler);
-
-var aliasFile = Cc["@mozilla.org/file/local;1"]
+var aliasFile = Cc['@mozilla.org/file/local;1']
       .createInstance(Ci.nsILocalFile);
-aliasFile.initWithPath("/Volumes/tmtxt/dotfirefox");
-
+aliasFile.initWithPath(dotfirefoxPath);
 var aliasURI = Services.io.newFileURI(aliasFile);
-resProt.setSubstitution("dotfirefox", aliasURI);
+resProt.setSubstitution('dotfirefox', aliasURI);
 
-let { main, Loader, Require, unload } = require('toolkit/loader');
+// create custom loader for dotfirefox dir and load ~/dotfirefox as main application
+// https://developer.mozilla.org/en-US/Add-ons/SDK/Low-Level_APIs/_loader
+let {main, Loader} = require('toolkit/loader');
 let options = require('@loader/options');
 options.paths['dotfirefox/'] = 'resource://dotfirefox/';
 let loader = Loader(options);
-let program = main(loader, 'dotfirefox/index.js');
-console.log(program);
-
-// require('dotfirefox/index.js');
-// let require2 = Cu.import("resource://gre/modules/commonjs/toolkit/require.js", {}).require;
-// require2('dotfirefox/index.js');
-
-// a dummy function, to show how tests work.
-// to see how to test this function, look at test/test-index.js
-function dummy(text, callback) {
-  callback(text);
-}
-
-exports.dummy = dummy;
+main(loader, 'dotfirefox/index.js');

@@ -1,7 +1,7 @@
 {
   "title": "Dot Firefox",
   "name": "dotfirefox",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Dot file initialization for Firefox",
   "main": "index.js",
   "author": "",
